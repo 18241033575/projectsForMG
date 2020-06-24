@@ -1,0 +1,47 @@
+.login_bg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f8f8f8;
+}
+
+.login_box {
+    padding: 36px;
+    width: 320px;
+    background-color: #ffffff;
+    box-shadow: 0 0 100px rgba(0, 0, 0, .08);
+}
+
+.login_title {
+    margin: 0;
+    text-align: center;
+    font-size: 18px;
+    color: #333333;
+    line-height: 24px;
+}
+
+.login_box input {
+    margin-top: 24px;
+}
+
+.login_box button {
+    margin: 20px 0;
+    width: 248px;
+}
+
+.tips_group {
+    display: flex;
+    justify-content: space-between;
+    color: #666666;
+}
+
+.change_login {
+    text-align: right;
+    cursor: pointer;
+}
+
+.change_login:hover {
+    color: #1890ff;
+    text-decoration: underline;
+}

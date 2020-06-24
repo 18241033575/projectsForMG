@@ -1,0 +1,56 @@
+.editable-cell {
+    position: relative;
+}
+
+.editable-cell-value-wrap {
+    padding: 5px 12px;
+    cursor: pointer;
+}
+
+.editable-row:hover .editable-cell-value-wrap {
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    padding: 4px 11px;
+}
+.edit {
+    margin-right: 10px;
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #1890ff;
+    cursor: pointer;
+}
+.delete {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 3px 9px;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #ff4d4f;
+    cursor: pointer;
+}
+.det {
+    margin-right: 10px;
+    display: inline-block;
+    margin-top: 10px;
+    padding: 3px 9px;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #909399;
+    cursor: pointer;
+}
+.row {
+    display: flex;
+    margin-top: 10px;
+}
+
+.row > span {
+    display: inline-block;
+    margin-right: 10px;
+    min-width: 80px;
+    line-height: 40px;
+}
+.row .cont {
+    width: 80%;
+}

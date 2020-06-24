@@ -1,0 +1,76 @@
+#projects .ant-table-thead > tr > th,#projects .ant-table-tbody > tr > td {
+    padding: 9px;
+}
+#projects {
+    /*width: 800px;*/
+}
+.chart table, .chart table tr {
+    border-bottom: 1px solid #eee;
+}
+.chart table td, .chart table th{
+    padding: 9px;
+    border: 1px solid #eee;
+    border-bottom: none;
+    box-sizing: border-box;
+}
+
+.chart table .workDay {
+    background-color: #7ca9d0;
+    border: none;
+}
+
+.remark {
+    width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.projects_table .cell {
+    /*display: inline-block;*/
+    /*padding: 5px 9px;*/
+    /*border: 1px solid #eee;*/
+}
+.chart {
+    overflow: auto;
+}
+.table_header {
+    word-break: keep-all;
+    white-space: nowrap;
+}
+.toggle_child {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #eee;
+    cursor: pointer;
+    text-align: center;
+    line-height: 20px;
+}
+
+.row_cell {
+    display: flex;
+    align-items: center;
+}
+.operate_btn {
+    margin-left: 10px;
+}
+.operate_img {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+.data_operate {
+    margin: 5px;
+}
+.add_operate {
+    margin-right: 120px;
+}
+.direct_row {
+    display: flex;
+    align-items: center;
+}
+.direct_row .minWidth {
+    display: inline-block;
+    min-width: 80px;
+}

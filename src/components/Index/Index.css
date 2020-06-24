@@ -1,0 +1,22 @@
+.logo{
+    text-align: center;
+    overflow: hidden;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 16px;
+}
+.logo span{
+    font-size: 24px;
+    color: #ffffff;
+}
+.logo img{
+    width: 100%;
+    height: 100%;
+}
+/*
+.ant-menu .ant-menu-item{
+    padding: 0!important;
+}
+.ant-menu .ant-menu-item a{
+    padding: 0 16px 0 24px;
+}*/
