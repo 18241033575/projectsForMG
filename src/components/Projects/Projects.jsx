@@ -1,10 +1,13 @@
 import React, {Component} from 'react';
-import {Table, Input, Button, Popconfirm, Form, Modal, Select} from 'antd';
+import {Table, Input, Button, Popconfirm, Form, Modal, Select, DatePicker } from 'antd';
 import './Projects.css'
 import {Config} from '../../config'
 import {showMessage} from "../Untils/untils";
+import moment from 'moment';
 
+const { RangePicker } = DatePicker;
 const { Option } = Select;
+const dateFormat = 'YYYY-MM-DD';
 
 const EditableContext = React.createContext();
 
@@ -191,12 +194,19 @@ export default class Projects extends Component {
             mapSign: true,
             confirmModal: false,
             confirmProjectModal: false,
+            confirmPersonModal: false,
+            confirmTaskModal: false,
+            confirmTimeModal: false,
             delId: '',
             dataTotal: [],
             spareData: [], // 备用数据 -- 用于重置任务状态-收起任务
             options: [],
             projectSelected: undefined,
-            project: {}
+            personSelected: undefined,
+            taskSelected: undefined,
+            project: {},
+            activeItem: {},
+            editTaskTime: {}
         };
 
     }
@@ -212,13 +222,12 @@ export default class Projects extends Component {
         for (let i = 1; i < days + 1; i++) {
             daysArray.push((new Date().getMonth() + 1 < 10 ? '0' + (new Date().getMonth() + 1) : (new Date().getMonth() + 1)) + '-' + (i < 10 ? '0' + i : i))
         }
-        showChart = [...showChart, ...daysArray]
+        showChart = [...showChart, ...daysArray];
         this.setState({
             showChart
         });
 
         this.getProjects();
-        console.log(this.getNowDay());
     }
 
     // 获取任务数据
@@ -232,30 +241,28 @@ export default class Projects extends Component {
                 if (res.code === 200) {
                     let tagData = [];
                     let chartData = [];
-                    /* res.data.forEach(function (item) {
-                         if (item.projects.length > 0) {
-                             tagData.push(...item.projects);
-                             item.projects.forEach((pro) => {
-                                 chartData.push(pro);
-                                 if (pro.children) {
-                                     chartData = [...chartData, ...pro.children]
-                                 }
-                             })
-                         }
-                     });*/
                     tagData = res.data;
+                    console.log(tagData);
+                    let midData = JSON.parse(JSON.stringify(tagData))
                     tagData.forEach((item, index) => {
                         item.key = item._id + index;
                         item.children && item.children.forEach((child, childIndex) => {
-                            tagData.splice(index + childIndex + 1, 0, child);
+                            // console.log(child);
+                            // console.log(item.children);
+                            let beforeLen = 0;
+                            for(let i = index; i < 0; i--) {
+                                beforeLen += tagData[i].children ? tagData[i].children.length : 0
+                            }
+                            midData.splice(beforeLen + index + childIndex + 1, 0, child);
+                            console.log(midData);
                             child.key = child._id + childIndex;
                         })
                     });
                     this.setState({
-                        dataSource: tagData,
+                        dataSource: midData,
                         count: res.data.length,
-                        dataTotal: tagData,
-                        spareData: JSON.parse(JSON.stringify(tagData))
+                        dataTotal: midData,
+                        spareData: JSON.parse(JSON.stringify(midData))
                     });
                 }
             })
@@ -343,7 +350,7 @@ export default class Projects extends Component {
         let month = date.getMonth() + 1 > 10 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1);
         let day = date.getDate() > 10 ? date.getDate() : '0' + date.getDate();
         return year + '-' + month + '-' + day
-    }
+    };
 
     // 获取当前月份天数
     getDays = () => {
@@ -365,6 +372,31 @@ export default class Projects extends Component {
     handleDelete = key => {
         const dataSource = [...this.state.dataSource];
         this.setState({dataSource: dataSource.filter(item => item.key !== key)});
+    };
+
+    editName = (item) => {
+        fetch(Config.host + '/groupMember', {
+            method: 'POST',
+            headers: {'Content-type': 'application/json'},
+            body: JSON.stringify(item)
+        })
+            .then(res => {
+                return res.json()
+            })
+            .then(res => {
+                if (res.code === 200) {
+                    console.log(res.data);
+                    this.setState({
+                        options: res.data
+                    })
+                } else {
+                    showMessage(res.msg, 'error');
+                }
+            });
+        this.setState({
+            activeItem: item,
+            confirmPersonModal: true
+        })
     };
 
     handleAdd = () => {
@@ -448,6 +480,7 @@ export default class Projects extends Component {
                 item.isOpen = !item.isOpen
             }
         });
+        console.log(data);
         this.setState({
             dataTotal: data
         })
@@ -484,6 +517,59 @@ export default class Projects extends Component {
         })
     };
 
+    // 保存任务
+    saveTask = (data) => {
+        fetch(Config.host + '/projects', {
+            method: 'POST',
+            headers: {'Content-type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+            .then(res => {
+                return res.json()
+            })
+            .then(res => {
+                if (res.code === 200) {
+                    this.getProjects()
+                }
+            })
+    }
+
+    // 添加子任务
+    addChildTask = (item) => {
+        console.log(item);
+        const {count} = this.state;
+
+        const newData = {
+            key: count,
+            task: '默认子任务',
+            taskId: 3,
+            name: item.name,
+            preTask: '默认前置任务',
+            taskStart: this.getNowDay(),
+            taskEnd: this.getNowDay(),
+            planDays: '1',
+            actualDays: '1',
+            state: 1,
+            parentId: item._id
+        };
+        fetch(Config.host + '/add_projects', {
+            method: 'POST',
+            headers: {'Content-type': 'application/json'},
+            body: JSON.stringify(newData)
+        })
+            .then(res => {
+                return res.json()
+            })
+            .then(res => {
+                if (res.code === 200) {
+                    showMessage(res.msg, 'success');
+                    this.getProjects()
+                } else {
+                    showMessage(res.msg, 'error');
+                }
+            })
+    };
+
     // 设置前置任务确定
     confirmProjectModalOk = () => {
 
@@ -500,9 +586,11 @@ export default class Projects extends Component {
                 return res.json()
             })
             .then(res => {
-                console.log(res);
                 if (res.code === 200) {
+                    showMessage(res.msg, 'success');
                     this.getProjects()
+                }else {
+                    showMessage(res.msg, 'error');
                 }
             });
         this.setState({
@@ -518,6 +606,56 @@ export default class Projects extends Component {
         })
     };
 
+    // 设置执行人取消
+    confirmPersonModalCancel = () => {
+        this.setState({
+            confirmPersonModal: false
+        })
+    };
+
+    // 设置执行人确定
+    confirmPersonModalOk = () => {
+        let data = this.state.activeItem;
+        data.name = this.state.personSelected;
+
+        if (this.state.personSelected) {
+            this.saveTask(data);
+            this.setState({
+                confirmPersonModal: false,
+                personSelected: undefined
+            })
+        }else {
+            showMessage('执行人不能为空', 'error')
+        }
+
+    };
+
+    // 设置任务名称
+    editTask = (item) => {
+        this.setState({
+            confirmTaskModal: true,
+            taskSelected: item.task,
+            activeItem: item
+        })
+    };
+
+    // 设置任务名称取消
+    confirmTaskModalCancel = () => {
+        this.setState({
+            confirmTaskModal: false,
+        })
+    };
+
+    // 设置任务名称确定
+    confirmTaskModalOk = () => {
+        let data = this.state.activeItem;
+        data.task = this.state.taskSelected;
+        this.setState({
+            confirmTaskModal: false
+        });
+        this.saveTask(data)
+    };
+
     // 前置任务下拉监听
     handleProjectChange = (value) => {
         let index = value.indexOf('#');
@@ -526,6 +664,57 @@ export default class Projects extends Component {
             projectSelected: value
         });
     };
+
+    // 执行人下拉监听
+    handlePersonChange = (value) => {
+        let index = value.indexOf('#');
+        value = value.slice(0, index);
+        this.setState({
+            personSelected: value
+        });
+    };
+
+    // 任务名称变化
+    handleTaskChange = (e) => {
+        this.setState({
+            taskSelected: e.target.value
+        })
+    };
+
+    // 时间取消
+    confirmTimeModalCancel = () => {
+        this.setState({
+            confirmTimeModal: false,
+        })
+    };
+
+    // 时间变化
+    handleTimeChange = (e, value) => {
+        this.setState({
+            editTaskTime: { start: value[0], end: value[1] }
+        })
+    };
+
+    // 编辑时间
+    editTime = (item) => {
+        this.setState({
+            confirmTimeModal: true,
+            activeItem: item,
+            editTaskTime: { start: item.taskStart, end: item.taskEnd }
+        })
+    };
+
+    // 保存时间编辑
+    confirmTimeModalOk = () => {
+        let data = this.state.activeItem;
+        data.taskStart = this.state.editTaskTime.start;
+        data.taskEnd = this.state.editTaskTime.end;
+        this.setState({
+            confirmTimeModal: false
+        });
+        this.saveTask(data);
+    };
+
     render() {
         const {dataSource} = this.state;
         const components = {
@@ -551,28 +740,15 @@ export default class Projects extends Component {
         });
         return (
             <div className="container">
-                <div id="projects">
-                    <Button onClick={this.handleAdd} type="primary" style={{marginBottom: 16}}>
-                        新增主任务
-                    </Button>
-                    <Button onClick={this.mapToggle} type="primary" style={{marginBottom: 16, float: 'right'}}>
-                        {
-                            this.state.mapSign ? '隐藏任务分布图' : '显示任务分布图'
-                        }
-                    </Button>
-                    {/*   <Table
-                        components={components}
-                        rowClassName={() => 'editable-row'}
-                        // bordered
-                        dataSource={dataSource}
-                        columns={columns}
-                    />*/}
-                </div>
                 {
                     this.state.mapSign && (<div className="chart">
                         <div>
-                            <img className={'operate_img data_operate add_operate'}
-                                 src={require('../../static/img/add.png')} alt=""/>
+                            <img
+                                className={'operate_img data_operate add_operate'}
+                                onClick={this.handleAdd}
+                                src={require('../../static/img/add.png')}
+                                alt=""
+                            />
                             <img className={'operate_img data_operate'}
                                  src={require('../../static/img/account_balance.png')} alt=""/>
                             <img className={'operate_img data_operate'} onClick={this.projects.bind(this)}
@@ -598,10 +774,15 @@ export default class Projects extends Component {
                             {
                                 this.state.dataTotal.map((item) => {
                                     return (
-                                        (item.isShow || !item.parentId) && (<tr key={item._id}>
+                                        (item.isShow || !item.parentId) && (<tr title={item.task + '(' + item.name + ')'} key={item._id}>
                                             <td>
                                                 <span className={'row_cell'}>
-                                                    {item.name}
+                                                    <span
+                                                        className={'min_name'}
+                                                        onClick={this.editName.bind(this, item)}
+                                                    >
+                                                        {item.name}
+                                                    </span>
                                                     <span className={'operate_btn'}>
 
                                                         {
@@ -610,7 +791,6 @@ export default class Projects extends Component {
                                                                  onClick={this.toggleChart.bind(this, item._id)}
                                                                  src={require(item.isOpen ? '../../static/img/up.png' : '../../static/img/down.png')}
                                                                  alt="btn"/>
-                                                            // <span className={'toggle_child'} onClick={this.toggleChart.bind(this, item._id)}>{ '-' : '+'}</span>
                                                         }
                                                     </span>
                                                 </span>
@@ -622,20 +802,24 @@ export default class Projects extends Component {
                                                                               src={require('../../static/img/down-right-tum.png')}
                                                                               alt=""/>
                                                     }
-                                                    <span className={'minWidth'}>
-                                                        {item.task}
+                                                    <span className={'min_width'}>
+                                                        <span className={'two_lines'} onClick={this.editTask.bind(this, item)}>
+                                                            {item.task}
+                                                        </span>
                                                     </span>
                                                     <img className={'operate_img'}
                                                          src={require('../../static/img/so-on.png')} alt=""/>
                                                     {
                                                         !item.parentId && <img className={'operate_img'}
                                                                                src={require('../../static/img/add.png')}
-                                                                               alt=""/>
+                                                                               onClick={this.addChildTask.bind(this, item)}
+                                                                               alt=""
+                                                        />
                                                     }
                                                 </span>
                                             </td>
-                                            <td>{item.taskStart}</td>
-                                            <td>{item.taskEnd}</td>
+                                            <td><span onClick={this.editTime.bind(this, item)}>{item.taskStart}</span></td>
+                                            <td><span onClick={this.editTime.bind(this, item)}>{item.taskEnd}</span></td>
                                             <td onClick={this.preTask.bind(this, item)}>
                                                 {
                                                     item.preTask === '默认前置任务' ? <img className={'operate_img'}
@@ -696,6 +880,58 @@ export default class Projects extends Component {
                             ))
                         }
                     </Select>
+                </Modal>
+                <Modal
+                    title="请选择执行人"
+                    centered
+                    okText={'确定'}
+                    cancelText={'取消'}
+                    visible={this.state.confirmPersonModal}
+                    onOk={() => this.confirmPersonModalOk(false)}
+                    onCancel={() => this.confirmPersonModalCancel(false)}
+                >
+                    <Select
+                        style={{ width: '100%' }}
+                        placeholder="请选择"
+                        onChange={this.handlePersonChange.bind(this)}
+                        value={this.state.personSelected}
+                        // options={this.state.options}
+                    >
+                        {
+                            this.state.options.map((item, index) => (
+                                <Option key={index} value={item.name + '#' + index}>{item.name}</Option>
+                            ))
+                        }
+                    </Select>
+                </Modal>
+                <Modal
+                    title="请输入任务名称"
+                    centered
+                    okText={'确定'}
+                    cancelText={'取消'}
+                    visible={this.state.confirmTaskModal}
+                    onOk={() => this.confirmTaskModalOk(false)}
+                    onCancel={() => this.confirmTaskModalCancel(false)}
+                >
+                    <Input
+                        value={this.state.taskSelected}
+                        placeholder={"请输入任务名称"}
+                        onChange={this.handleTaskChange.bind(this)}
+                    />
+                </Modal>
+                <Modal
+                    title="请选择任务周期"
+                    centered
+                    okText={'确定'}
+                    cancelText={'取消'}
+                    visible={this.state.confirmTimeModal}
+                    onOk={() => this.confirmTimeModalOk(false)}
+                    onCancel={() => this.confirmTimeModalCancel(false)}
+                >
+                    <RangePicker
+                        value={[moment(this.state.editTaskTime.start, dateFormat), moment(this.state.editTaskTime.end, dateFormat)]}
+                        onChange={this.handleTimeChange.bind(this)}
+                    />
                 </Modal>
             </div>
 

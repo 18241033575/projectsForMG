@@ -31,6 +31,9 @@
     /*padding: 5px 9px;*/
     /*border: 1px solid #eee;*/
 }
+.projects_table tbody tr:hover {
+    background-color: rgba(124, 169, 208, .1);
+}
 .chart {
     overflow: auto;
 }
@@ -70,7 +73,20 @@
     display: flex;
     align-items: center;
 }
-.direct_row .minWidth {
+.direct_row .min_width {
     display: inline-block;
     min-width: 80px;
+}
+.min_name {
+    display: inline-block;
+    min-width: 48px;
+    cursor: pointer;
+}
+.two_lines {
+    display: -webkit-box;
+    width: 80px;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
