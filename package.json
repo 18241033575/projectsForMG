@@ -19,7 +19,7 @@
     "react-transition-group": "^4.2.1"
   },
   "scripts": {
-    "start": "set PORT=7088 && react-scripts start  --open",
+    "start": "set HOST=192.168.4.164&&set PORT=8000 && react-scripts start  --open",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

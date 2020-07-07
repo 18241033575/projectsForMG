@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom';
 
 
-import {Layout, Menu, Breadcrumb, Icon, Avatar, Badge } from 'antd';
+import {Layout, Menu, Breadcrumb, Icon, Avatar } from 'antd';
 import Login from '../Login/Login'
 import './Index.css'
 import Note404 from '../Note404/Note404';
@@ -20,7 +20,6 @@ import Statistics from "../Statistics/Statistics";
 
 
 const {Header, Content, Footer, Sider} = Layout;
-const {SubMenu} = Menu;
 
 
 
@@ -155,55 +154,6 @@ export default class Index extends Component {
                                                 <span>数据统计</span>
                                             </NavLink>
                                         </Menu.Item>
-                                        {/*<SubMenu*/}
-                                            {/*key="sub1"*/}
-                                            {/*title={*/}
-                                                {/*<span>*/}
-                                                  {/*<Icon type="appstore"/>*/}
-                                                  {/*<span>应用</span>*/}
-                                                {/*</span>*/}
-                                            {/*}*/}
-                                        {/*>*/}
-                                            {/*<SubMenu*/}
-                                                {/*key="sub2"*/}
-                                                {/*title={*/}
-                                                    {/*<span>*/}
-                                                  {/*<Icon type="file-protect"/>*/}
-                                                  {/*<span>设置</span>*/}
-                                                {/*</span>*/}
-                                                {/*}*/}
-                                            {/*>*/}
-                                                {/*<Menu.Item key="2">*/}
-                                                    {/*<NavLink exact to={'/setting/group'}>*/}
-                                                        {/*小组管理*/}
-                                                    {/*</NavLink>*/}
-                                                {/*</Menu.Item>*/}
-                                                {/*{*/}
-                                                    {/*auth > 8 && (<Menu.Item key="3">*/}
-                                                        {/*<NavLink exact to={'/setting/user'}>*/}
-                                                            {/*人员管理*/}
-                                                        {/*</NavLink>*/}
-                                                    {/*</Menu.Item>)*/}
-                                                {/*}*/}
-                                            {/*</SubMenu>*/}
-                                            {/*<SubMenu*/}
-                                                {/*key="sub3"*/}
-                                                {/*title={*/}
-                                                    {/*<span>*/}
-                                                  {/*<Icon type="solution"/>*/}
-                                                  {/*<span>社区系统</span>*/}
-                                                {/*</span>*/}
-                                                {/*}*/}
-                                            {/*>*/}
-                                                {/*<Menu.Item key="5">帖子列表</Menu.Item>*/}
-                                                {/*<Menu.Item key="6">回帖列表</Menu.Item>*/}
-                                            {/*</SubMenu>*/}
-                                            {/*<Menu.Item key="7">*/}
-                                                {/*<NavLink exact to={'/system/news'}>*/}
-                                                    {/*消息中心*/}
-                                                {/*</NavLink>*/}
-                                            {/*</Menu.Item>*/}
-                                        {/*</SubMenu>*/}
                                     </Menu>
                                 </Sider>
                                 <Layout>

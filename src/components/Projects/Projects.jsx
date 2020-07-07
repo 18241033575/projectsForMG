@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table, Input, Button, Popconfirm, Form, Modal, Select, DatePicker } from 'antd';
+import { Input, Modal, Select, DatePicker } from 'antd';
 import './Projects.css'
 import {Config} from '../../config'
 import {showMessage} from "../Untils/untils";
@@ -8,108 +8,6 @@ import moment from 'moment';
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 const dateFormat = 'YYYY-MM-DD';
-
-const EditableContext = React.createContext();
-
-const EditableRow = ({form, index, ...props}) => (
-    <EditableContext.Provider value={form}>
-        <tr {...props} />
-    </EditableContext.Provider>
-);
-
-
-// const expandedRowRender = record => <p>{record.name}</p>;
-
-const EditableFormRow = Form.create()(EditableRow);
-
-class EditableCell extends React.Component {
-
-    state = {
-        editing: false,
-    };
-
-    toggleEdit = () => {
-        const editing = !this.state.editing;
-        this.setState({editing}, () => {
-            if (editing) {
-                this.input.focus();
-            }
-        });
-    };
-
-
-    save = e => {
-        const {record, handleSave} = this.props;
-        this.form.validateFields((error, values) => {
-            if (error && error[e.currentTarget.id]) {
-                return;
-            }
-            this.toggleEdit();
-            handleSave({...record, ...values});
-        });
-    };
-
-
-    renderCell = form => {
-        this.form = form;
-        const {children, dataIndex, record, title} = this.props;
-        const {editing} = this.state;
-        return (editing) ? (
-            <Form.Item style={{margin: 0}}>
-                {form.getFieldDecorator(dataIndex, {
-                    /*rules: [
-                        {
-                            required: true,
-                            message: `${title} is required.`,
-                        },
-                    ],*/
-                    initialValue: record[dataIndex],
-                })(<Input ref={node => (this.input = node)} onPressEnter={this.save} onBlur={this.save}/>)}
-            </Form.Item>
-        ) : (
-            <div
-                className={`editable-cell-value-wrap ${dataIndex === 'remark' ? 'remark' : ''}`}
-                style={{paddingRight: 24}}
-                onClick={this.toggleEdit}
-                title={dataIndex === 'remark' ? record.remark : ''}
-
-            >
-                {children}
-            </div>
-        );
-    };
-
-    render() {
-        let user = JSON.parse(localStorage.getItem('USER'));
-        const {
-            editable,
-            dataIndex,
-            title,
-            record,
-            index,
-            handleSave,
-            children,
-            ...restProps
-        } = this.props;
-
-        return (
-            <td {...restProps}>
-                {(editable && (user.auth > 4 || dataIndex !== 'name')) ? (
-                    <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>
-                ) : (
-                    children
-                )}
-            </td>
-        );
-    }
-}
-
-
-
-function handleChange(value) {
-    console.log(`selected ${value}`);
-}
-
 
 export default class Projects extends Component {
     constructor(props) {
@@ -240,21 +138,13 @@ export default class Projects extends Component {
             .then(res => {
                 if (res.code === 200) {
                     let tagData = [];
-                    let chartData = [];
                     tagData = res.data;
-                    console.log(tagData);
-                    let midData = JSON.parse(JSON.stringify(tagData))
+                    let midData = JSON.parse(JSON.stringify(tagData));
                     tagData.forEach((item, index) => {
                         item.key = item._id + index;
+                        let idx = midData.length - tagData.length;
                         item.children && item.children.forEach((child, childIndex) => {
-                            // console.log(child);
-                            // console.log(item.children);
-                            let beforeLen = 0;
-                            for(let i = index; i < 0; i--) {
-                                beforeLen += tagData[i].children ? tagData[i].children.length : 0
-                            }
-                            midData.splice(beforeLen + index + childIndex + 1, 0, child);
-                            console.log(midData);
+                            midData.splice(index + childIndex + idx + 1, 0, child);
                             child.key = child._id + childIndex;
                         })
                     });
@@ -385,7 +275,6 @@ export default class Projects extends Component {
             })
             .then(res => {
                 if (res.code === 200) {
-                    console.log(res.data);
                     this.setState({
                         options: res.data
                     })
@@ -480,7 +369,6 @@ export default class Projects extends Component {
                 item.isOpen = !item.isOpen
             }
         });
-        console.log(data);
         this.setState({
             dataTotal: data
         })
@@ -496,7 +384,6 @@ export default class Projects extends Component {
 
     // 设置前置任务
     preTask = (project) => {
-        console.log(this.getNowDay().slice(5));
         let midData = this.state.spareData,
             midArray = [];
         midData.forEach((item) => {
@@ -508,7 +395,6 @@ export default class Projects extends Component {
             }
 
         });
-        console.log(project.preTask);
         this.setState({
             confirmProjectModal: true,
             options: midArray,
@@ -536,7 +422,6 @@ export default class Projects extends Component {
 
     // 添加子任务
     addChildTask = (item) => {
-        console.log(item);
         const {count} = this.state;
 
         const newData = {
@@ -716,28 +601,6 @@ export default class Projects extends Component {
     };
 
     render() {
-        const {dataSource} = this.state;
-        const components = {
-            body: {
-                row: EditableFormRow,
-                cell: EditableCell,
-            },
-        };
-        const columns = this.columns.map(col => {
-            if (!col.editable) {
-                return col;
-            }
-            return {
-                ...col,
-                onCell: record => ({
-                    record,
-                    editable: col.editable,
-                    dataIndex: col.dataIndex,
-                    title: col.title,
-                    handleSave: this.handleSave,
-                }),
-            };
-        });
         return (
             <div className="container">
                 {
@@ -763,7 +626,7 @@ export default class Projects extends Component {
                                 {
                                     this.state.showChart.map((item, index) => {
                                             return (
-                                                <th className={ this.getNowDay().slice(5) == item ? 'cell workDay' : 'cell'} key={index}> {item} </th>
+                                                <th className={ this.getNowDay().slice(5) === item ? 'cell workDay' : 'cell'} key={index}> {item} </th>
                                             )
                                         }
                                     )
@@ -832,7 +695,7 @@ export default class Projects extends Component {
                                                 this.state.dateArray.map(date => {
                                                     return item.taskStart && (
                                                         <td key={date}
-                                                            className={(item.taskStart.substring(item.taskStart.length - 2, item.taskStart.length) <= (date + 1) && item.taskEnd.substring(item.taskEnd.length - 2, item.taskEnd.length) >= (date + 1)) ? 'workDay' : ''}>
+                                                            className={(item.taskStart.substring(item.taskStart.length - 5, item.taskStart.length) <= ((new Date().getMonth() + 1 < 10 ? '0' + (new Date().getMonth() + 1) : (new Date().getMonth() + 1)) + '-' + (date < 9 ? '0' + (date + 1) : date + 1)) && item.taskEnd.substring(item.taskEnd.length - 5, item.taskEnd.length) >= ((new Date().getMonth() + 1 < 10 ? '0' + (new Date().getMonth() + 1) : (new Date().getMonth() + 1)) + '-' + (date < 9 ? '0' + (date + 1) : date + 1))) ? 'workDay' : ''}>
                                                         </td>
                                                     )
                                                 })
