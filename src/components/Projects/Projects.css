@@ -8,14 +8,20 @@
     border-bottom: 1px solid #eee;
 }
 .chart table td, .chart table th{
-    padding: 9px;
+    padding: 3px;
     border: 1px solid #eee;
     border-bottom: none;
     box-sizing: border-box;
+    text-align: center;
 }
 
 .chart table .workDay {
     background-color: #7ca9d0;
+    border: none;
+}
+
+.chart table .restDay {
+    background-color: #ddd;
     border: none;
 }
 
@@ -26,16 +32,15 @@
     white-space: nowrap;
 }
 
-.projects_table .cell {
-    /*display: inline-block;*/
-    /*padding: 5px 9px;*/
-    /*border: 1px solid #eee;*/
+.cell p {
+    margin: 0;
 }
 .projects_table tbody tr:hover {
     background-color: rgba(124, 169, 208, .1);
 }
 .chart {
     overflow: auto;
+    min-height: calc(100vh - 220px);
 }
 .table_header {
     word-break: keep-all;
@@ -89,4 +94,13 @@
     -webkit-box-orient: vertical;
     text-overflow: ellipsis;
     overflow: hidden;
+    cursor: pointer;
+}
+.depend {
+    width: 40px;
+}
+
+.main_task {
+    font-size: 16px;
+    font-weight: bold;
 }

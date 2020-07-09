@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { Table, Button, Modal, Select } from 'antd';
 import { showMessage } from '../Untils/untils'
-
+import { Config } from '../../config'
 
 export default  class GroupDet extends Component {
 
@@ -133,7 +133,7 @@ export default  class GroupDet extends Component {
     };
     // 获取数据
     getGroupData = () => {
-        fetch('http://localhost:8888/getGroupDet?group=' + this.state.group)
+        fetch(Config.host + '/getGroupDet?group=' + this.state.group)
             .then(res => {
                 return res.json()
             })
@@ -152,7 +152,7 @@ export default  class GroupDet extends Component {
 
     // 操作分类数据
     setMemberData = () => {
-        fetch('http://localhost:8888/memberGroup', {
+        fetch(Config.host + '/memberGroup', {
             method: 'POST',
             mode: 'cors',
             headers: {
@@ -193,7 +193,7 @@ export default  class GroupDet extends Component {
 
     // 获取没有分组的用户
     getNoGroupUser = () => {
-        fetch('http://localhost:8888/userNoGroup', {
+        fetch(Config.host + 'userNoGroup', {
             method: 'GET',
             mode: 'cors',
             headers: {

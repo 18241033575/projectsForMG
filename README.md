@@ -3,7 +3,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## Available Scripts
 
 In the project directory, you can run:
-
+项目启动指令（设置了host和port 需要和本地主机host一致）
 ### `npm start`
 
 Runs the app in the development mode.<br>
@@ -16,7 +16,7 @@ You will also see any lint errors in the console.
 
 Launches the test runner in the interactive watch mode.<br>
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
+项目打包之前需要更改src>config文件下的配置，以适配线上
 ### `npm run build`
 
 Builds the app for production to the `build` folder.<br>
